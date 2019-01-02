@@ -40,8 +40,8 @@ object PSOnlineMatrixFactorizationImplicitTest{
     val lastFM = data.flatMap(new RichFlatMapFunction[String, Rating] {
 
       override def flatMap(value: String, out: Collector[Rating]): Unit = {
-        val fieldsArray = value.split(" ")
-        val r = Rating.fromTuple(fieldsArray(1).toInt, fieldsArray(2).toInt, 1.0)
+        val fieldsArray = value.split(",")
+        val r = Rating.fromTuple(fieldsArray(1).toInt, fieldsArray(2).toInt, fieldsArray(4).toInt, fieldsArray(3))
         out.collect(r)
       }
     })
@@ -58,36 +58,27 @@ object PSOnlineMatrixFactorizationImplicitTest{
       workerParallelism,
       psParallelism,
       iterationWaitTime)
-        .addSink(new RichSinkFunction[Either[(UserId, Vector), (ItemId, Vector)]] {
+        .addSink(new RichSinkFunction[Either[(String, Double), (ItemId, Vector)]] {
 
-          val userVectors = new mutable.HashMap[UserId, Vector]
-          val itemVectors = new mutable.HashMap[ItemId, Vector]
+          var trainLoss = 0.0
+          var testLoss = 0.0
 
-          override def invoke(value: Either[(UserId, Vector), (ItemId, Vector)]): Unit = {
-
+          override def invoke(value: Either[(String, Double), (ItemId, Vector)]): Unit = {
             value match {
-              case Left((userId, vec)) =>
-                userVectors.update(userId, vec)
-              case Right((itemId, vec)) =>
-                itemVectors.update(itemId, vec)
+              case Left((label, loss)) => label match {
+                case "train" => trainLoss += loss
+                case "test" => testLoss += loss
+              }
             }
           }
 
           override def close(): Unit = {
             val userVectorFile = new java.io.PrintWriter(new java.io.File(userVector_output_name))
-            for((k,v) <- userVectors){
-              for(value <- v){
-                userVectorFile.write(k + ";" + value + '\n')
-              }
-            }
+            userVectorFile.write(trainLoss.toString + '\n')
             userVectorFile.close()
 
             val itemVectorFile = new java.io.PrintWriter(new java.io.File(itemVector_output_name))
-            for((k,v) <- itemVectors){
-              for(value <- v){
-                itemVectorFile.write(k + ";" + value + '\n')
-              }
-            }
+            itemVectorFile.write(testLoss.toString + '\n')
             itemVectorFile.close()
           }
 

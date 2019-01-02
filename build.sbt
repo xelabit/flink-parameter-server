@@ -2,9 +2,9 @@ name := "flink-ps"
 
 version := "0.1.0"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.12"
 
-lazy val flinkVersion = "1.4.0"
+lazy val flinkVersion = "1.6.2"
 lazy val breezeVersion = "0.13"
 
 lazy val commonDependencies = Seq(
@@ -52,7 +52,7 @@ lazy val root = (project in file(".")).
 lazy val commonSettings = Seq(
   organization := "hu.sztaki.ilab",
   version := "0.1.0",
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.12",
   test in assembly := {}
 )
 
