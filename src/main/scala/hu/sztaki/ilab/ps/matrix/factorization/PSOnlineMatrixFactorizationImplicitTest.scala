@@ -1,14 +1,12 @@
 package hu.sztaki.ilab.ps.matrix.factorization
 
 import hu.sztaki.ilab.ps.matrix.factorization.utils.Rating
-import hu.sztaki.ilab.ps.matrix.factorization.utils.Utils.{ItemId, UserId}
+import hu.sztaki.ilab.ps.matrix.factorization.utils.Utils.ItemId
 import hu.sztaki.ilab.ps.matrix.factorization.utils.Vector._
 import org.apache.flink.api.common.functions.RichFlatMapFunction
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.util.Collector
-
-import scala.collection.mutable
 
 
 class PSOnlineMatrixFactorizationImplicitTest {
